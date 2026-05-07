@@ -177,9 +177,22 @@ cmake --build build
 ./build/test_ungula_rtc_drivers
 ```
 
+or just:
+
+```bash
+cd tests
+chmod +x *sh
+./1_build.sh
+./2_run.sh
+```
+
+## Acknowledgements
+
+Thanks to Claude and ChatGPT for helping on generating this documentation.
+
 ## License
 
-MIT License — see [LICENSE](LICENSE) file.
+MIT License — see [LICENSE](license.txt) file.
 
 ---
 
