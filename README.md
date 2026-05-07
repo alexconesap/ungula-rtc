@@ -108,6 +108,8 @@ A fresh chip reports `isTimeValid() == false`. The host decides where the time c
 ### From NTP, after WiFi comes up
 
 ```cpp
+#include <ungula/rtc.h>
+
 if (!chip.isTimeValid()) {
     if (auto epochMs = ntpFetchOnce()) {
         chip.writeEpochMs(*epochMs);   // also clears OSF / CH
@@ -119,6 +121,8 @@ if (!chip.isTimeValid()) {
 ### From a setup screen / build-time default
 
 ```cpp
+#include <ungula/rtc.h>
+
 if (!chip.isTimeValid()) {
     showSetupScreen();          // host code, asks the user
     chip.writeEpochMs(userEpochMs);
@@ -133,6 +137,8 @@ After the write, every subsequent `tc::now()` flows through the chip until power
 Same shape as encoders. If the chip lives behind a TCA9548:
 
 ```cpp
+#include <ungula/rtc.h>
+
 ungula::hal::multiplexer::drivers::MultiplexerTCA9548 mux70(0x70, bus);
 ungula::rtc::drivers::Ds3231 chip(bus, &mux70);
 mux70.begin();
@@ -142,6 +148,8 @@ chip.begin(/*channel=*/3);
 Direct-connect (default):
 
 ```cpp
+#include <ungula/rtc.h>
+
 ungula::rtc::drivers::Ds3231 chip(bus);
 chip.begin();   // multiplexer channel ignored
 ```
@@ -153,6 +161,8 @@ The driver handles `selectMultiplexerChannel()` internally before every transact
 Off by default. `enableLogging()` routes diagnostics through EmblogX with the module tag `rtc`. Per-instance — debugging one RTC doesn't pollute logs from other devices.
 
 ```cpp
+#include <ungula/rtc.h>
+
 chip.enableLogging();
 ```
 
