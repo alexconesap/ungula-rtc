@@ -10,24 +10,27 @@
 #include <ungula/rtc/drivers/rtc_fake.h>
 #include <ungula/rtc/rtc_time_provider.h>
 
-namespace {
+namespace
+{
 
     namespace tc = ungula::core::time;
     using ungula::rtc::RtcTimeProvider;
     using ungula::rtc::drivers::RtcFake;
 
     class RtcTimeProviderTest : public ::testing::Test {
-        protected:
-            void TearDown() override {
-                tc::clearTimeProvider();
-            }
+    protected:
+        void TearDown() override
+        {
+            tc::clearTimeProvider();
+        }
     };
 
     // The host millis() runs forward by real wall time; we don't try to
     // mock it. Tests that assert on cache TTL therefore use millisecond-
     // scale TTLs so the elapsed real time stays well inside the window.
 
-    TEST_F(RtcTimeProviderTest, IsValidFalseUntilChipInitialised) {
+    TEST_F(RtcTimeProviderTest, IsValidFalseUntilChipInitialised)
+    {
         RtcFake fake;
         RtcTimeProvider provider(fake);
         // Fresh fake: begin() not called → readEpochMs fails →
@@ -35,10 +38,11 @@ namespace {
         EXPECT_FALSE(provider.isValid());
     }
 
-    TEST_F(RtcTimeProviderTest, NowMsReturnsChipEpochAfterFirstRead) {
+    TEST_F(RtcTimeProviderTest, NowMsReturnsChipEpochAfterFirstRead)
+    {
         RtcFake fake;
         fake.begin(0);
-        fake.setEpochMs(1'700'000'000'000LL);
+        fake.setEpochMs(1 '700' 000 '000' 000LL);
         fake.setTimeValid(true);
 
         RtcTimeProvider provider(fake);
@@ -47,15 +51,16 @@ namespace {
         // The provider anchors on the chip read and adds elapsed local
         // millis(). On a fast host that's ≤ a few ms — accept a small
         // window so the test stays stable.
-        EXPECT_GE(reported, 1'700'000'000'000LL);
-        EXPECT_LT(reported, 1'700'000'000'000LL + 1000);
+        EXPECT_GE(reported, 1 '700' 000 '000' 000LL);
+        EXPECT_LT(reported, 1 '700' 000 '000' 000LL + 1000);
         EXPECT_TRUE(provider.isValid());
     }
 
-    TEST_F(RtcTimeProviderTest, CacheHitDoesNotReReadTheChip) {
+    TEST_F(RtcTimeProviderTest, CacheHitDoesNotReReadTheChip)
+    {
         RtcFake fake;
         fake.begin(0);
-        fake.setEpochMs(1'700'000'000'000LL);
+        fake.setEpochMs(1 '700' 000 '000' 000LL);
         fake.setTimeValid(true);
 
         RtcTimeProvider provider(fake);
@@ -71,14 +76,15 @@ namespace {
         EXPECT_EQ(fake.readEpochCallCount(), firstReadCount);
     }
 
-    TEST_F(RtcTimeProviderTest, ZeroTtlForcesEveryCallToReReadTheChip) {
+    TEST_F(RtcTimeProviderTest, ZeroTtlForcesEveryCallToReReadTheChip)
+    {
         RtcFake fake;
         fake.begin(0);
-        fake.setEpochMs(1'700'000'000'000LL);
+        fake.setEpochMs(1 '700' 000 '000' 000LL);
         fake.setTimeValid(true);
 
         RtcTimeProvider provider(fake);
-        provider.setRefreshIntervalMs(0);  // disable cache
+        provider.setRefreshIntervalMs(0); // disable cache
 
         for (int i = 0; i < 3; ++i) {
             (void)provider.nowMs();
@@ -86,10 +92,11 @@ namespace {
         EXPECT_GE(fake.readEpochCallCount(), 3U);
     }
 
-    TEST_F(RtcTimeProviderTest, InvalidateCacheForcesNextReadFromChip) {
+    TEST_F(RtcTimeProviderTest, InvalidateCacheForcesNextReadFromChip)
+    {
         RtcFake fake;
         fake.begin(0);
-        fake.setEpochMs(1'000'000LL);
+        fake.setEpochMs(1 '000' 000LL);
         fake.setTimeValid(true);
 
         RtcTimeProvider provider(fake);
@@ -110,11 +117,12 @@ namespace {
         EXPECT_GT(fake.readEpochCallCount(), before);
     }
 
-    TEST_F(RtcTimeProviderTest, TimeNotValidOnChipMakesProviderInvalid) {
+    TEST_F(RtcTimeProviderTest, TimeNotValidOnChipMakesProviderInvalid)
+    {
         RtcFake fake;
         fake.begin(0);
-        fake.setTimeValid(false);  // OSF / CH set
-        fake.setEpochMs(1'700'000'000'000LL);  // even with a value present
+        fake.setTimeValid(false); // OSF / CH set
+        fake.setEpochMs(1 '700' 000 '000' 000LL); // even with a value present
 
         RtcTimeProvider provider(fake);
         EXPECT_FALSE(provider.isValid());
@@ -123,11 +131,12 @@ namespace {
         // millis() in that case. We just verify isValid() is the gate.
     }
 
-    TEST_F(RtcTimeProviderTest, ReadFailureMakesProviderInvalid) {
+    TEST_F(RtcTimeProviderTest, ReadFailureMakesProviderInvalid)
+    {
         RtcFake fake;
         fake.begin(0);
         fake.setTimeValid(true);
-        fake.setReadResult(false);  // wire is dead
+        fake.setReadResult(false); // wire is dead
 
         RtcTimeProvider provider(fake);
         EXPECT_FALSE(provider.isValid());
@@ -135,10 +144,11 @@ namespace {
 
     // ---- Plug-in into core's setTimeProvider ----
 
-    TEST_F(RtcTimeProviderTest, InstallsAsCoreTimeProvider) {
+    TEST_F(RtcTimeProviderTest, InstallsAsCoreTimeProvider)
+    {
         RtcFake fake;
         fake.begin(0);
-        fake.setEpochMs(1'700'000'000'000LL);
+        fake.setEpochMs(1 '700' 000 '000' 000LL);
         fake.setTimeValid(true);
 
         RtcTimeProvider provider(fake);
@@ -148,11 +158,12 @@ namespace {
         // the chip. Both layers must be wired correctly for this to
         // return the scripted epoch.
         const int64_t reported = tc::now();
-        EXPECT_GE(reported, 1'700'000'000'000LL);
-        EXPECT_LT(reported, 1'700'000'000'000LL + 1000);
+        EXPECT_GE(reported, 1 '700' 000 '000' 000LL);
+        EXPECT_LT(reported, 1 '700' 000 '000' 000LL + 1000);
     }
 
-    TEST_F(RtcTimeProviderTest, CoreNowFallsBackToLocalWhenChipInvalid) {
+    TEST_F(RtcTimeProviderTest, CoreNowFallsBackToLocalWhenChipInvalid)
+    {
         RtcFake fake;
         fake.begin(0);
         fake.setTimeValid(false);
@@ -165,4 +176,4 @@ namespace {
         EXPECT_LT(tc::now(), 1'000'000'000LL);
     }
 
-}  // namespace
+} // namespace

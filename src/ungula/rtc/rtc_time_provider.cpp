@@ -4,9 +4,11 @@
 
 #include "rtc_time_provider.h"
 
-namespace ungula::rtc {
+namespace ungula::rtc
+{
 
-    int64_t RtcTimeProvider::nowMs() const {
+    int64_t RtcTimeProvider::nowMs() const
+    {
         ensureCacheFresh();
         if (!cachedValid_) {
             return 0;
@@ -18,16 +20,17 @@ namespace ungula::rtc {
         return cachedEpochMs_ + elapsed;
     }
 
-    bool RtcTimeProvider::isValid() const {
+    bool RtcTimeProvider::isValid() const
+    {
         ensureCacheFresh();
         return cachedValid_;
     }
 
-    void RtcTimeProvider::ensureCacheFresh() const {
+    void RtcTimeProvider::ensureCacheFresh() const
+    {
         const tick_ms_t now = ungula::core::time::millis();
-        if (cachedValid_ && refreshIntervalMs_ > 0 &&
-            (now - cachedAnchorTick_) < refreshIntervalMs_) {
-            return;  // cache hit
+        if (cachedValid_ && refreshIntervalMs_ > 0 && (now - cachedAnchorTick_) < refreshIntervalMs_) {
+            return; // cache hit
         }
 
         // Re-read the chip. If the chip says "time not valid" or the
@@ -47,4 +50,4 @@ namespace ungula::rtc {
         cachedValid_ = true;
     }
 
-}  // namespace ungula::rtc
+} // namespace ungula::rtc

@@ -11,7 +11,8 @@
 #include <ungula/rtc/drivers/rtc_fake.h>
 #include <ungula/rtc/i_rtc.h>
 
-namespace {
+namespace
+{
 
     using ungula::hal::multiplexer::drivers::MultiplexerFake;
     using ungula::rtc::Error;
@@ -20,33 +21,37 @@ namespace {
 
     // ---- Interface contract / drift detection ------------------------------
 
-    TEST(IRtcContract, FakeImplementsEveryPureVirtual) {
+    TEST(IRtcContract, FakeImplementsEveryPureVirtual)
+    {
         RtcFake fake;
-        IRtc* api = static_cast<IRtc*>(&fake);
+        IRtc *api = static_cast<IRtc *>(&fake);
         EXPECT_TRUE(api->begin(0));
         EXPECT_TRUE(api->isConnected());
-        EXPECT_TRUE(api->writeEpochMs(1'700'000'000'000LL));
+        EXPECT_TRUE(api->writeEpochMs(1 '700' 000 '000' 000LL));
         EXPECT_TRUE(api->isTimeValid());
         ungula::rtc::epoch_ms_t now = 0;
         EXPECT_TRUE(api->readEpochMs(now));
-        EXPECT_EQ(now, 1'700'000'000'000LL);
+        EXPECT_EQ(now, 1 '700' 000 '000' 000LL);
     }
 
     // ---- Multiplexer optional ---------------------------------------------
 
-    TEST(IRtc, DirectConnectHasNoMultiplexer) {
+    TEST(IRtc, DirectConnectHasNoMultiplexer)
+    {
         RtcFake fake;
         EXPECT_FALSE(fake.hasMultiplexer());
     }
 
-    TEST(IRtc, ReadFailsWhenBeginNeverCalled) {
+    TEST(IRtc, ReadFailsWhenBeginNeverCalled)
+    {
         RtcFake fake;
         ungula::rtc::epoch_ms_t out = 0;
         EXPECT_FALSE(fake.readEpochMs(out));
         EXPECT_EQ(fake.getLastError(), Error::NotInitialized);
     }
 
-    TEST(IRtc, MultiplexedReadSelectsTheConfiguredChannel) {
+    TEST(IRtc, MultiplexedReadSelectsTheConfiguredChannel)
+    {
         MultiplexerFake mux;
         mux.begin();
 
@@ -61,7 +66,8 @@ namespace {
         EXPECT_EQ(mux.lastChannel(), 2U);
     }
 
-    TEST(IRtc, MultiplexerFailurePropagatesAsError) {
+    TEST(IRtc, MultiplexerFailurePropagatesAsError)
+    {
         MultiplexerFake mux;
         mux.begin();
         mux.setSelectAlwaysFails(true);
@@ -76,7 +82,8 @@ namespace {
 
     // ---- Validity flag ----------------------------------------------------
 
-    TEST(IRtc, FreshChipReportsTimeNotValid) {
+    TEST(IRtc, FreshChipReportsTimeNotValid)
+    {
         RtcFake fake;
         fake.begin(0);
         // The fake mirrors a freshly-powered chip with battery never set:
@@ -84,15 +91,17 @@ namespace {
         EXPECT_FALSE(fake.isTimeValid());
     }
 
-    TEST(IRtc, SuccessfulWriteFlipsValidityToTrue) {
+    TEST(IRtc, SuccessfulWriteFlipsValidityToTrue)
+    {
         RtcFake fake;
         fake.begin(0);
         EXPECT_FALSE(fake.isTimeValid());
-        EXPECT_TRUE(fake.writeEpochMs(1'700'000'000'000LL));
+        EXPECT_TRUE(fake.writeEpochMs(1 '700' 000 '000' 000LL));
         EXPECT_TRUE(fake.isTimeValid());
     }
 
-    TEST(IRtc, FailedWriteLeavesValidityUntouched) {
+    TEST(IRtc, FailedWriteLeavesValidityUntouched)
+    {
         RtcFake fake;
         fake.begin(0);
         fake.setWriteResult(false);
@@ -101,7 +110,8 @@ namespace {
         EXPECT_FALSE(fake.isTimeValid());
     }
 
-    TEST(IRtc, ReadFailureSurfacesAsI2CReadError) {
+    TEST(IRtc, ReadFailureSurfacesAsI2CReadError)
+    {
         RtcFake fake;
         fake.begin(0);
         fake.setReadResult(false);
@@ -112,12 +122,14 @@ namespace {
 
     // ---- Logging toggle ---------------------------------------------------
 
-    TEST(IRtcLogging, DefaultsOff) {
+    TEST(IRtcLogging, DefaultsOff)
+    {
         RtcFake fake;
         EXPECT_FALSE(fake.isLoggingEnabled());
     }
 
-    TEST(IRtcLogging, EnableDisableFlipsFlag) {
+    TEST(IRtcLogging, EnableDisableFlipsFlag)
+    {
         RtcFake fake;
         fake.enableLogging();
         EXPECT_TRUE(fake.isLoggingEnabled());
@@ -127,21 +139,20 @@ namespace {
 
     // ---- Error mapping ----------------------------------------------------
 
-    TEST(IRtc, GetLastErrorAsStrCoversEveryEnumValue) {
+    TEST(IRtc, GetLastErrorAsStrCoversEveryEnumValue)
+    {
         RtcFake fake;
         const Error allValues[] = {
-                Error::None,             Error::NotInitialized,
-                Error::BeginFailed,      Error::NotConnected,
-                Error::MultiplexerError, Error::TimeNotValid,
-                Error::I2CReadError,     Error::I2CWriteError,
+            Error::None,         Error::NotInitialized,   Error::BeginFailed,
+            Error::NotConnected, Error::MultiplexerError, Error::TimeNotValid,
+            Error::I2CReadError, Error::I2CWriteError,
         };
         for (Error e : allValues) {
             fake.setStatus(e);
-            const char* msg = fake.getLastErrorAsStr();
+            const char *msg = fake.getLastErrorAsStr();
             ASSERT_NE(msg, nullptr);
-            EXPECT_GT(strlen(msg), 0U)
-                    << "missing message for enum " << static_cast<int>(e);
+            EXPECT_GT(strlen(msg), 0U) << "missing message for enum " << static_cast<int>(e);
         }
     }
 
-}  // namespace
+} // namespace

@@ -7,18 +7,21 @@
 #include "ungula/rtc/detail/bcd.h"
 #include "ungula/rtc/detail/datetime_codec.h"
 
-namespace ungula::rtc::drivers {
+namespace ungula::rtc::drivers
+{
 
-    namespace {
+    namespace
+    {
         constexpr uint8_t REG_TIME_BASE = 0x00;
-        constexpr uint8_t SECONDS_CH_MASK = 0x80;  // bit 7 of seconds reg = clock halt
+        constexpr uint8_t SECONDS_CH_MASK = 0x80; // bit 7 of seconds reg = clock halt
         constexpr uint8_t HOUR_24H_MASK = 0x3F;
-    }  // namespace
+    } // namespace
 
     using detail::bcdToBin;
     using detail::binToBcd;
 
-    bool Ds1307::begin(uint8_t multiplexerChannel) {
+    bool Ds1307::begin(uint8_t multiplexerChannel)
+    {
         multiplexerChannel_ = multiplexerChannel;
         address_ = DS1307_DEFAULT_ADDRESS;
         isInitialized_ = true;
@@ -38,11 +41,13 @@ namespace ungula::rtc::drivers {
         return true;
     }
 
-    bool Ds1307::isConnected() {
+    bool Ds1307::isConnected()
+    {
         return bus_.write(address_, nullptr, 0);
     }
 
-    bool Ds1307::readSecondsRegister(uint8_t& out) {
+    bool Ds1307::readSecondsRegister(uint8_t &out)
+    {
         const uint8_t reg = REG_TIME_BASE;
         if (!bus_.writeRead(address_, &reg, 1, &out, 1)) {
             last_error_ = Error::I2CReadError;
@@ -51,7 +56,8 @@ namespace ungula::rtc::drivers {
         return true;
     }
 
-    bool Ds1307::isTimeValid() {
+    bool Ds1307::isTimeValid()
+    {
         if (!selectMultiplexerChannel()) {
             return false;
         }
@@ -65,12 +71,13 @@ namespace ungula::rtc::drivers {
         return (seconds & SECONDS_CH_MASK) == 0;
     }
 
-    bool Ds1307::readEpochMs(epoch_ms_t& out) {
+    bool Ds1307::readEpochMs(epoch_ms_t &out)
+    {
         if (!selectMultiplexerChannel()) {
             return false;
         }
         const uint8_t reg = REG_TIME_BASE;
-        uint8_t buf[7] = {0};
+        uint8_t buf[7] = { 0 };
         if (!bus_.writeRead(address_, &reg, 1, buf, sizeof(buf))) {
             last_error_ = Error::I2CReadError;
             logErrorf("time read failed");
@@ -93,7 +100,8 @@ namespace ungula::rtc::drivers {
         return true;
     }
 
-    bool Ds1307::writeEpochMs(epoch_ms_t epochMs) {
+    bool Ds1307::writeEpochMs(epoch_ms_t epochMs)
+    {
         if (!selectMultiplexerChannel()) {
             return false;
         }
@@ -107,14 +115,12 @@ namespace ungula::rtc::drivers {
         // Writing 0 into bit 7 of the seconds register clears CH, so the
         // single block-write also re-starts the oscillator if it was halted.
         const uint8_t buf[8] = {
-                REG_TIME_BASE,
-                binToBcd(dt.second),                                // CH cleared (bit 7 = 0)
-                binToBcd(dt.minute),
-                binToBcd(dt.hour),                                  // 24-hour mode (bit 6 = 0)
-                binToBcd(dt.dayOfWeek),
-                binToBcd(dt.day),
-                binToBcd(dt.month),
-                binToBcd(static_cast<uint8_t>(dt.year - 2000U)),
+            REG_TIME_BASE,
+            binToBcd(dt.second), // CH cleared (bit 7 = 0)
+            binToBcd(dt.minute),
+            binToBcd(dt.hour), // 24-hour mode (bit 6 = 0)
+            binToBcd(dt.dayOfWeek), binToBcd(dt.day),
+            binToBcd(dt.month),     binToBcd(static_cast<uint8_t>(dt.year - 2000U)),
         };
         if (!bus_.write(address_, buf, sizeof(buf))) {
             last_error_ = Error::I2CWriteError;
@@ -127,4 +133,4 @@ namespace ungula::rtc::drivers {
         return true;
     }
 
-}  // namespace ungula::rtc::drivers
+} // namespace ungula::rtc::drivers

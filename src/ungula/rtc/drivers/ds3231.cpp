@@ -7,20 +7,23 @@
 #include "ungula/rtc/detail/bcd.h"
 #include "ungula/rtc/detail/datetime_codec.h"
 
-namespace ungula::rtc::drivers {
+namespace ungula::rtc::drivers
+{
 
-    namespace {
+    namespace
+    {
         constexpr uint8_t REG_TIME_BASE = 0x00;
         constexpr uint8_t REG_STATUS = 0x0F;
-        constexpr uint8_t STATUS_OSF_MASK = 0x80;  // bit 7 = oscillator stopped
+        constexpr uint8_t STATUS_OSF_MASK = 0x80; // bit 7 = oscillator stopped
 
-        constexpr uint8_t HOUR_24H_MASK = 0x3F;  // 24-hour mode: bits 0..5 hold the hour
-    }  // namespace
+        constexpr uint8_t HOUR_24H_MASK = 0x3F; // 24-hour mode: bits 0..5 hold the hour
+    } // namespace
 
     using detail::bcdToBin;
     using detail::binToBcd;
 
-    bool Ds3231::begin(uint8_t multiplexerChannel) {
+    bool Ds3231::begin(uint8_t multiplexerChannel)
+    {
         multiplexerChannel_ = multiplexerChannel;
         address_ = DS3231_DEFAULT_ADDRESS;
         // Mark initialised before the probe so that a probe failure
@@ -42,11 +45,13 @@ namespace ungula::rtc::drivers {
         return true;
     }
 
-    bool Ds3231::isConnected() {
+    bool Ds3231::isConnected()
+    {
         return bus_.write(address_, nullptr, 0);
     }
 
-    bool Ds3231::readStatusRegister(uint8_t& out) {
+    bool Ds3231::readStatusRegister(uint8_t &out)
+    {
         const uint8_t reg = REG_STATUS;
         if (!bus_.writeRead(address_, &reg, 1, &out, 1)) {
             last_error_ = Error::I2CReadError;
@@ -55,8 +60,9 @@ namespace ungula::rtc::drivers {
         return true;
     }
 
-    bool Ds3231::writeStatusRegister(uint8_t value) {
-        const uint8_t buf[2] = {REG_STATUS, value};
+    bool Ds3231::writeStatusRegister(uint8_t value)
+    {
+        const uint8_t buf[2] = { REG_STATUS, value };
         if (!bus_.write(address_, buf, sizeof(buf))) {
             last_error_ = Error::I2CWriteError;
             return false;
@@ -64,7 +70,8 @@ namespace ungula::rtc::drivers {
         return true;
     }
 
-    bool Ds3231::isTimeValid() {
+    bool Ds3231::isTimeValid()
+    {
         if (!selectMultiplexerChannel()) {
             return false;
         }
@@ -78,12 +85,13 @@ namespace ungula::rtc::drivers {
         return (status & STATUS_OSF_MASK) == 0;
     }
 
-    bool Ds3231::readEpochMs(epoch_ms_t& out) {
+    bool Ds3231::readEpochMs(epoch_ms_t &out)
+    {
         if (!selectMultiplexerChannel()) {
             return false;
         }
         const uint8_t reg = REG_TIME_BASE;
-        uint8_t buf[7] = {0};
+        uint8_t buf[7] = { 0 };
         if (!bus_.writeRead(address_, &reg, 1, buf, sizeof(buf))) {
             last_error_ = Error::I2CReadError;
             logErrorf("time read failed");
@@ -91,12 +99,12 @@ namespace ungula::rtc::drivers {
         }
 
         detail::DateTime dt{};
-        dt.second = bcdToBin(buf[0] & 0x7FU);              // bit 7 reserved on DS3231
+        dt.second = bcdToBin(buf[0] & 0x7FU); // bit 7 reserved on DS3231
         dt.minute = bcdToBin(buf[1] & 0x7FU);
-        dt.hour = bcdToBin(buf[2] & HOUR_24H_MASK);        // 24-hour mode by convention
+        dt.hour = bcdToBin(buf[2] & HOUR_24H_MASK); // 24-hour mode by convention
         dt.dayOfWeek = bcdToBin(buf[3] & 0x07U);
         dt.day = bcdToBin(buf[4] & 0x3FU);
-        dt.month = bcdToBin(buf[5] & 0x1FU);               // bit 7 = century, ignored
+        dt.month = bcdToBin(buf[5] & 0x1FU); // bit 7 = century, ignored
         dt.year = static_cast<uint16_t>(2000U + bcdToBin(buf[6]));
 
         out = detail::toEpochMs(dt);
@@ -104,7 +112,8 @@ namespace ungula::rtc::drivers {
         return true;
     }
 
-    bool Ds3231::writeEpochMs(epoch_ms_t epochMs) {
+    bool Ds3231::writeEpochMs(epoch_ms_t epochMs)
+    {
         if (!selectMultiplexerChannel()) {
             return false;
         }
@@ -118,14 +127,14 @@ namespace ungula::rtc::drivers {
         }
 
         const uint8_t buf[8] = {
-                REG_TIME_BASE,
-                binToBcd(dt.second),
-                binToBcd(dt.minute),
-                binToBcd(dt.hour),                                  // 24-hour mode
-                binToBcd(dt.dayOfWeek),
-                binToBcd(dt.day),
-                binToBcd(dt.month),                                 // bit 7 (century) = 0
-                binToBcd(static_cast<uint8_t>(dt.year - 2000U)),
+            REG_TIME_BASE,
+            binToBcd(dt.second),
+            binToBcd(dt.minute),
+            binToBcd(dt.hour), // 24-hour mode
+            binToBcd(dt.dayOfWeek),
+            binToBcd(dt.day),
+            binToBcd(dt.month), // bit 7 (century) = 0
+            binToBcd(static_cast<uint8_t>(dt.year - 2000U)),
         };
         if (!bus_.write(address_, buf, sizeof(buf))) {
             last_error_ = Error::I2CWriteError;
@@ -154,4 +163,4 @@ namespace ungula::rtc::drivers {
         return true;
     }
 
-}  // namespace ungula::rtc::drivers
+} // namespace ungula::rtc::drivers

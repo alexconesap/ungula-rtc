@@ -39,51 +39,58 @@
 ///   tc::formatLocal(ts, sizeof(ts)); // "2026-04-23 15:32:11"
 /// ```
 
-namespace ungula::rtc {
+namespace ungula::rtc
+{
 
     class RtcTimeProvider final : public ungula::core::time::ITimeProvider {
-        public:
-            using duration_ms_t = ungula::core::time::duration_ms_t;
-            using tick_ms_t = ungula::core::time::tick_ms_t;
+    public:
+        using duration_ms_t = ungula::core::time::duration_ms_t;
+        using tick_ms_t = ungula::core::time::tick_ms_t;
 
-            /// @param chip  Borrowed reference. Caller owns it and must
-            ///              keep it alive for the provider's lifetime.
-            explicit RtcTimeProvider(IRtc& chip) : chip_(chip) {}
+        /// @param chip  Borrowed reference. Caller owns it and must
+        ///              keep it alive for the provider's lifetime.
+        explicit RtcTimeProvider(IRtc &chip)
+                : chip_(chip)
+        {
+        }
 
-            // ---- ITimeProvider ----
+        // ---- ITimeProvider ----
 
-            int64_t nowMs() const override;
-            bool isValid() const override;
+        int64_t nowMs() const override;
+        bool isValid() const override;
 
-            // ---- Cache control ----
+        // ---- Cache control ----
 
-            /// @brief Override the cache TTL. `0` disables caching (every
-            /// `now()` re-reads the chip).
-            void setRefreshIntervalMs(duration_ms_t intervalMs) {
-                refreshIntervalMs_ = intervalMs;
-            }
-            duration_ms_t refreshIntervalMs() const {
-                return refreshIntervalMs_;
-            }
+        /// @brief Override the cache TTL. `0` disables caching (every
+        /// `now()` re-reads the chip).
+        void setRefreshIntervalMs(duration_ms_t intervalMs)
+        {
+            refreshIntervalMs_ = intervalMs;
+        }
+        duration_ms_t refreshIntervalMs() const
+        {
+            return refreshIntervalMs_;
+        }
 
-            /// @brief Force the next `now()` to re-read the chip.
-            /// Useful after a `chip.writeEpochMs(...)` to avoid serving
-            /// stale cached values for up to TTL ms.
-            void invalidateCache() {
-                cachedValid_ = false;
-            }
+        /// @brief Force the next `now()` to re-read the chip.
+        /// Useful after a `chip.writeEpochMs(...)` to avoid serving
+        /// stale cached values for up to TTL ms.
+        void invalidateCache()
+        {
+            cachedValid_ = false;
+        }
 
-        private:
-            void ensureCacheFresh() const;
+    private:
+        void ensureCacheFresh() const;
 
-            IRtc& chip_;
-            duration_ms_t refreshIntervalMs_ = 1000;
+        IRtc &chip_;
+        duration_ms_t refreshIntervalMs_ = 1000;
 
-            // Mutable because `nowMs()` / `isValid()` are logically const
-            // but the cache updates on those calls.
-            mutable epoch_ms_t cachedEpochMs_ = 0;
-            mutable tick_ms_t cachedAnchorTick_ = 0;
-            mutable bool cachedValid_ = false;
+        // Mutable because `nowMs()` / `isValid()` are logically const
+        // but the cache updates on those calls.
+        mutable epoch_ms_t cachedEpochMs_ = 0;
+        mutable tick_ms_t cachedAnchorTick_ = 0;
+        mutable bool cachedValid_ = false;
     };
 
-}  // namespace ungula::rtc
+} // namespace ungula::rtc

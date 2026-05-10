@@ -20,31 +20,34 @@
 ///
 /// I2C address is fixed at `0x68`. Default 400 kHz works on every part.
 
-namespace ungula::rtc::drivers {
+namespace ungula::rtc::drivers
+{
 
     constexpr uint8_t DS3231_DEFAULT_ADDRESS = 0x68;
 
     class Ds3231 final : public IRtc {
-        public:
-            /// @param bus         I2C bus the chip lives on. Borrowed.
-            /// @param multiplexer Optional. `nullptr` means direct-connect.
-            /// @param name        Caller-chosen tag, e.g. "main". Borrowed.
-            Ds3231(ungula::hal::i2c::I2cMaster& bus,
-                   ungula::hal::multiplexer::IMultiplexer* multiplexer = nullptr,
-                   const char* name = "main")
-                    : IRtc("DS3231", name, multiplexer), bus_(bus) {}
+    public:
+        /// @param bus         I2C bus the chip lives on. Borrowed.
+        /// @param multiplexer Optional. `nullptr` means direct-connect.
+        /// @param name        Caller-chosen tag, e.g. "main". Borrowed.
+        Ds3231(ungula::hal::i2c::I2cMaster &bus, ungula::hal::multiplexer::IMultiplexer *multiplexer = nullptr,
+               const char *name = "main")
+                : IRtc("DS3231", name, multiplexer)
+                , bus_(bus)
+        {
+        }
 
-            bool begin(uint8_t multiplexerChannel = 0) override;
-            bool isConnected() override;
-            bool isTimeValid() override;
-            bool readEpochMs(epoch_ms_t& out) override;
-            bool writeEpochMs(epoch_ms_t epochMs) override;
+        bool begin(uint8_t multiplexerChannel = 0) override;
+        bool isConnected() override;
+        bool isTimeValid() override;
+        bool readEpochMs(epoch_ms_t &out) override;
+        bool writeEpochMs(epoch_ms_t epochMs) override;
 
-        private:
-            bool readStatusRegister(uint8_t& out);
-            bool writeStatusRegister(uint8_t value);
+    private:
+        bool readStatusRegister(uint8_t &out);
+        bool writeStatusRegister(uint8_t value);
 
-            ungula::hal::i2c::I2cMaster& bus_;
+        ungula::hal::i2c::I2cMaster &bus_;
     };
 
-}  // namespace ungula::rtc::drivers
+} // namespace ungula::rtc::drivers
