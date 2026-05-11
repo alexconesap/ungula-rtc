@@ -28,7 +28,7 @@ namespace
         dt.hour = 22;
         dt.minute = 13;
         dt.second = 20;
-        EXPECT_EQ(toEpochMs(dt), 1 '700' 000 '000' 000LL);
+        EXPECT_EQ(toEpochMs(dt), 1'700'000'000'000LL);
     }
 
     TEST(DateTimeCodec, EpochZeroDecodesToUnixEpoch)
@@ -46,8 +46,10 @@ namespace
     {
         const int64_t samples[] = {
             0,
-            946 '684' 800 '000LL,   // 2000-01-01 00:00:00 — DS1307/DS3231 base 1 ' 234 ' 567 ' 890' 123LL, // arbitrary 2009 instant 1 '700' 000 '000' 000LL, // 2023-11-14 22:13:20
-            4 '102' 444 '799' 000LL, // 2099-12-31 23:59:59 — top of chip range
+            946'684'800'000LL, // 2000-01-01 00:00:00 — DS1307/DS3231 base
+            1'234'567'890'123LL, // arbitrary 2009 instant
+            1'700'000'000'000LL, // 2023-11-14 22:13:20
+            4'102'444'799'000LL, // 2099-12-31 23:59:59 — top of chip range
         };
         for (int64_t ms : samples) {
             // Round-trip is at second resolution because the codec drops

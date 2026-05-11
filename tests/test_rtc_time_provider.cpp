@@ -42,7 +42,7 @@ namespace
     {
         RtcFake fake;
         fake.begin(0);
-        fake.setEpochMs(1 '700' 000 '000' 000LL);
+        fake.setEpochMs(1'700'000'000'000LL);
         fake.setTimeValid(true);
 
         RtcTimeProvider provider(fake);
@@ -51,8 +51,8 @@ namespace
         // The provider anchors on the chip read and adds elapsed local
         // millis(). On a fast host that's ≤ a few ms — accept a small
         // window so the test stays stable.
-        EXPECT_GE(reported, 1 '700' 000 '000' 000LL);
-        EXPECT_LT(reported, 1 '700' 000 '000' 000LL + 1000);
+        EXPECT_GE(reported, 1'700'000'000'000LL);
+        EXPECT_LT(reported, 1'700'000'000'000LL + 1000);
         EXPECT_TRUE(provider.isValid());
     }
 
@@ -60,11 +60,11 @@ namespace
     {
         RtcFake fake;
         fake.begin(0);
-        fake.setEpochMs(1 '700' 000 '000' 000LL);
+        fake.setEpochMs(1'700'000'000'000LL);
         fake.setTimeValid(true);
 
         RtcTimeProvider provider(fake);
-        provider.setRefreshIntervalMs(60'000);  // 60 s window — no expiry
+        provider.setRefreshIntervalMs(60'000); // 60 s window — no expiry
 
         (void)provider.nowMs();
         const uint32_t firstReadCount = fake.readEpochCallCount();
@@ -80,7 +80,7 @@ namespace
     {
         RtcFake fake;
         fake.begin(0);
-        fake.setEpochMs(1 '700' 000 '000' 000LL);
+        fake.setEpochMs(1'700'000'000'000LL);
         fake.setTimeValid(true);
 
         RtcTimeProvider provider(fake);
@@ -96,7 +96,7 @@ namespace
     {
         RtcFake fake;
         fake.begin(0);
-        fake.setEpochMs(1 '000' 000LL);
+        fake.setEpochMs(1'000'000LL);
         fake.setTimeValid(true);
 
         RtcTimeProvider provider(fake);
@@ -122,7 +122,7 @@ namespace
         RtcFake fake;
         fake.begin(0);
         fake.setTimeValid(false); // OSF / CH set
-        fake.setEpochMs(1 '700' 000 '000' 000LL); // even with a value present
+        fake.setEpochMs(1'700'000'000'000LL); // even with a value present
 
         RtcTimeProvider provider(fake);
         EXPECT_FALSE(provider.isValid());
@@ -148,7 +148,7 @@ namespace
     {
         RtcFake fake;
         fake.begin(0);
-        fake.setEpochMs(1 '700' 000 '000' 000LL);
+        fake.setEpochMs(1'700'000'000'000LL);
         fake.setTimeValid(true);
 
         RtcTimeProvider provider(fake);
@@ -158,8 +158,8 @@ namespace
         // the chip. Both layers must be wired correctly for this to
         // return the scripted epoch.
         const int64_t reported = tc::now();
-        EXPECT_GE(reported, 1 '700' 000 '000' 000LL);
-        EXPECT_LT(reported, 1 '700' 000 '000' 000LL + 1000);
+        EXPECT_GE(reported, 1'700'000'000'000LL);
+        EXPECT_LT(reported, 1'700'000'000'000LL + 1000);
     }
 
     TEST_F(RtcTimeProviderTest, CoreNowFallsBackToLocalWhenChipInvalid)

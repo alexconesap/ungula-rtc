@@ -27,11 +27,11 @@ namespace
         IRtc *api = static_cast<IRtc *>(&fake);
         EXPECT_TRUE(api->begin(0));
         EXPECT_TRUE(api->isConnected());
-        EXPECT_TRUE(api->writeEpochMs(1 '700' 000 '000' 000LL));
+        EXPECT_TRUE(api->writeEpochMs(1'700'000'000'000LL));
         EXPECT_TRUE(api->isTimeValid());
         ungula::rtc::epoch_ms_t now = 0;
         EXPECT_TRUE(api->readEpochMs(now));
-        EXPECT_EQ(now, 1 '700' 000 '000' 000LL);
+        EXPECT_EQ(now, 1'700'000'000'000LL);
     }
 
     // ---- Multiplexer optional ---------------------------------------------
@@ -96,7 +96,7 @@ namespace
         RtcFake fake;
         fake.begin(0);
         EXPECT_FALSE(fake.isTimeValid());
-        EXPECT_TRUE(fake.writeEpochMs(1 '700' 000 '000' 000LL));
+        EXPECT_TRUE(fake.writeEpochMs(1'700'000'000'000LL));
         EXPECT_TRUE(fake.isTimeValid());
     }
 
