@@ -7,7 +7,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#include "ungula/core/time/time_control.h"
+#include "ungula/core/time/time.h"
 #include "ungula/hal/multiplexer/i_multiplexer.h"
 
 /// @brief Chip-neutral interface for battery-backed real-time clocks.

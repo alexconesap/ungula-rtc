@@ -75,7 +75,7 @@ Drivers do not include `<Wire.h>` or any Arduino API. Time and pacing go through
 #include <ungula/hal/i2c/i2c_master.h>
 #include <ungula/rtc/drivers/ds3231.h>
 #include <ungula/rtc/rtc_time_provider.h>
-#include <ungula/core/time/time_control.h>
+#include <ungula/core/time/time.h>
 
 namespace tc = ungula::core::time;
 

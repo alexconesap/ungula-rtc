@@ -6,7 +6,7 @@
 
 #include <cstdint>
 
-#include <ungula/core/time/time_control.h>
+#include <ungula/core/time/time.h>
 #include <ungula/rtc/drivers/rtc_fake.h>
 #include <ungula/rtc/rtc_time_provider.h>
 

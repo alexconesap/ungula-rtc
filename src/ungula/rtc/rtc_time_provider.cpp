@@ -16,7 +16,7 @@ namespace ungula::rtc
         const tick_ms_t nowTick = ungula::core::time::millis();
         const tick_ms_t elapsed = nowTick - cachedAnchorTick_;
         // Both anchors and ticks are signed 64-bit — diff is exact even
-        // across long uptimes. See time_control.h for the rationale.
+        // across long uptimes. See time.h for the rationale.
         return cachedEpochMs_ + elapsed;
     }
 

@@ -7,7 +7,7 @@
 #include <stdint.h>
 
 #include "ungula/core/time/i_time_provider.h"
-#include "ungula/core/time/time_control.h"
+#include "ungula/core/time/time.h"
 #include "ungula/rtc/i_rtc.h"
 
 /// @brief `ITimeProvider` adapter that routes wall-clock reads through
