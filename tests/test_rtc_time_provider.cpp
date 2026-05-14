@@ -127,7 +127,7 @@ namespace
         RtcTimeProvider provider(fake);
         EXPECT_FALSE(provider.isValid());
         // ITimeProvider contract says now() may return anything when
-        // !isValid(); core's TimeControl::now() falls back to local
+        // !isValid(); core's ungula::core::time::now() falls back to local
         // millis() in that case. We just verify isValid() is the gate.
     }
 

@@ -19,7 +19,7 @@ namespace
     TEST(DateTimeCodec, KnownReferenceInstantUtc)
     {
         // 2023-11-14 22:13:20 UTC == 1700000000 s == 1700000000000 ms.
-        // Same anchor used by the time_format / TimeControl tests, so a
+        // Same anchor used by the time_format / ungula::core::time tests, so a
         // mismatch here means we drifted from the rest of the codebase.
         DateTime dt{};
         dt.year = 2023;
