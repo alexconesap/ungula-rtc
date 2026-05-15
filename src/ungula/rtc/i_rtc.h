@@ -37,17 +37,17 @@
 namespace ungula::rtc
 {
 
-    /// Same alias as `ungula::core::time::epoch_ms_t` — kept here to
-    /// keep the interface header self-sufficient.
-    using epoch_ms_t = ungula::core::time::epoch_ms_t;
+/// Same alias as `ungula::core::time::epoch_ms_t` — kept here to
+/// keep the interface header self-sufficient.
+using epoch_ms_t = ungula::core::time::epoch_ms_t;
 
-    enum class Status : uint8_t {
+enum class Status : uint8_t {
         Ok = 0,
         InitializationError,
         Error,
-    };
+};
 
-    enum class Error : uint8_t {
+enum class Error : uint8_t {
         None = 0,
         NotInitialized,
         BeginFailed,
@@ -56,15 +56,16 @@ namespace ungula::rtc
         TimeNotValid, // OSF / CH bit set; read may be stale
         I2CReadError,
         I2CWriteError,
-    };
+};
 
-    /// @brief Abstract base for all RTC chips.
-    class IRtc {
+/// @brief Abstract base for all RTC chips.
+class IRtc {
     public:
         /// @param model       Short label, e.g. "DS3231". Borrowed.
         /// @param name        Caller-chosen tag, e.g. "main". Borrowed.
         /// @param multiplexer Optional. `nullptr` means "wired direct".
-        IRtc(const char *model, const char *name, ungula::hal::multiplexer::IMultiplexer *multiplexer)
+        IRtc(const char *model, const char *name,
+             ungula::hal::multiplexer::IMultiplexer *multiplexer)
                 : model_(model)
                 , name_(name)
                 , multiplexer_(multiplexer)
@@ -80,42 +81,42 @@ namespace ungula::rtc
 
         const char *getName() const
         {
-            return name_;
+                return name_;
         }
         const char *getModel() const
         {
-            return model_;
+                return model_;
         }
 
         uint8_t getAddress() const
         {
-            return address_;
+                return address_;
         }
         bool hasMultiplexer() const
         {
-            return multiplexer_ != nullptr;
+                return multiplexer_ != nullptr;
         }
 
         // ---- Status helpers (concrete on the base) ----
 
         Error getLastError() const
         {
-            return last_error_;
+                return last_error_;
         }
         const char *getLastErrorAsStr() const;
         void clearLastError()
         {
-            setStatus(Error::None);
+                setStatus(Error::None);
         }
         void setStatus(Error error)
         {
-            last_error_ = error;
-            status_ = (error == Error::None) ? Status::Ok : Status::Error;
+                last_error_ = error;
+                status_ = (error == Error::None) ? Status::Ok : Status::Error;
         }
         void setInitializationStatus(Error error)
         {
-            last_error_ = error;
-            status_ = (error == Error::None) ? Status::Ok : Status::InitializationError;
+                last_error_ = error;
+                status_ = (error == Error::None) ? Status::Ok : Status::InitializationError;
         }
 
         // ---- Driver contract ----
@@ -148,15 +149,15 @@ namespace ungula::rtc
 
         void enableLogging()
         {
-            loggingEnabled_ = true;
+                loggingEnabled_ = true;
         }
         void disableLogging()
         {
-            loggingEnabled_ = false;
+                loggingEnabled_ = false;
         }
         bool isLoggingEnabled() const
         {
-            return loggingEnabled_;
+                return loggingEnabled_;
         }
 
     protected:
@@ -172,7 +173,7 @@ namespace ungula::rtc
 
         bool shouldLog() const
         {
-            return loggingEnabled_;
+                return loggingEnabled_;
         }
 
         /// @brief Per-instance log helpers. Each prepends the prefix
@@ -202,6 +203,6 @@ namespace ungula::rtc
 
     private:
         bool loggingEnabled_ = false;
-    };
+};
 
 } // namespace ungula::rtc

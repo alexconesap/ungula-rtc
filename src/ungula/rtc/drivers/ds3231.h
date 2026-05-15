@@ -23,14 +23,15 @@
 namespace ungula::rtc::drivers
 {
 
-    constexpr uint8_t DS3231_DEFAULT_ADDRESS = 0x68;
+constexpr uint8_t DS3231_DEFAULT_ADDRESS = 0x68;
 
-    class Ds3231 final : public IRtc {
+class Ds3231 final : public IRtc {
     public:
         /// @param bus         I2C bus the chip lives on. Borrowed.
         /// @param multiplexer Optional. `nullptr` means direct-connect.
         /// @param name        Caller-chosen tag, e.g. "main". Borrowed.
-        Ds3231(ungula::hal::i2c::I2cMaster &bus, ungula::hal::multiplexer::IMultiplexer *multiplexer = nullptr,
+        Ds3231(ungula::hal::i2c::I2cMaster &bus,
+               ungula::hal::multiplexer::IMultiplexer *multiplexer = nullptr,
                const char *name = "main")
                 : IRtc("DS3231", name, multiplexer)
                 , bus_(bus)
@@ -48,6 +49,6 @@ namespace ungula::rtc::drivers
         bool writeStatusRegister(uint8_t value);
 
         ungula::hal::i2c::I2cMaster &bus_;
-    };
+};
 
 } // namespace ungula::rtc::drivers

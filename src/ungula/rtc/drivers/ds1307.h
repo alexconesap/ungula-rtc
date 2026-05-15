@@ -25,11 +25,12 @@
 namespace ungula::rtc::drivers
 {
 
-    constexpr uint8_t DS1307_DEFAULT_ADDRESS = 0x68;
+constexpr uint8_t DS1307_DEFAULT_ADDRESS = 0x68;
 
-    class Ds1307 final : public IRtc {
+class Ds1307 final : public IRtc {
     public:
-        Ds1307(ungula::hal::i2c::I2cMaster &bus, ungula::hal::multiplexer::IMultiplexer *multiplexer = nullptr,
+        Ds1307(ungula::hal::i2c::I2cMaster &bus,
+               ungula::hal::multiplexer::IMultiplexer *multiplexer = nullptr,
                const char *name = "main")
                 : IRtc("DS1307", name, multiplexer)
                 , bus_(bus)
@@ -46,6 +47,6 @@ namespace ungula::rtc::drivers
         bool readSecondsRegister(uint8_t &out);
 
         ungula::hal::i2c::I2cMaster &bus_;
-    };
+};
 
 } // namespace ungula::rtc::drivers

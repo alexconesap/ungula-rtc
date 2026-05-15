@@ -13,33 +13,33 @@
 namespace
 {
 
-    namespace tc = ungula::core::time;
-    using ungula::rtc::RtcTimeProvider;
-    using ungula::rtc::drivers::RtcFake;
+namespace tc = ungula::core::time;
+using ungula::rtc::RtcTimeProvider;
+using ungula::rtc::drivers::RtcFake;
 
-    class RtcTimeProviderTest : public ::testing::Test {
+class RtcTimeProviderTest : public ::testing::Test {
     protected:
         void TearDown() override
         {
-            tc::clearTimeProvider();
+                tc::clearTimeProvider();
         }
-    };
+};
 
-    // The host millis() runs forward by real wall time; we don't try to
-    // mock it. Tests that assert on cache TTL therefore use millisecond-
-    // scale TTLs so the elapsed real time stays well inside the window.
+// The host millis() runs forward by real wall time; we don't try to
+// mock it. Tests that assert on cache TTL therefore use millisecond-
+// scale TTLs so the elapsed real time stays well inside the window.
 
-    TEST_F(RtcTimeProviderTest, IsValidFalseUntilChipInitialised)
-    {
+TEST_F(RtcTimeProviderTest, IsValidFalseUntilChipInitialised)
+{
         RtcFake fake;
         RtcTimeProvider provider(fake);
         // Fresh fake: begin() not called → readEpochMs fails →
         // provider reports invalid.
         EXPECT_FALSE(provider.isValid());
-    }
+}
 
-    TEST_F(RtcTimeProviderTest, NowMsReturnsChipEpochAfterFirstRead)
-    {
+TEST_F(RtcTimeProviderTest, NowMsReturnsChipEpochAfterFirstRead)
+{
         RtcFake fake;
         fake.begin(0);
         fake.setEpochMs(1'700'000'000'000LL);
@@ -54,10 +54,10 @@ namespace
         EXPECT_GE(reported, 1'700'000'000'000LL);
         EXPECT_LT(reported, 1'700'000'000'000LL + 1000);
         EXPECT_TRUE(provider.isValid());
-    }
+}
 
-    TEST_F(RtcTimeProviderTest, CacheHitDoesNotReReadTheChip)
-    {
+TEST_F(RtcTimeProviderTest, CacheHitDoesNotReReadTheChip)
+{
         RtcFake fake;
         fake.begin(0);
         fake.setEpochMs(1'700'000'000'000LL);
@@ -71,13 +71,13 @@ namespace
 
         // Three more calls — all should be cache hits.
         for (int i = 0; i < 3; ++i) {
-            (void)provider.nowMs();
+                (void)provider.nowMs();
         }
         EXPECT_EQ(fake.readEpochCallCount(), firstReadCount);
-    }
+}
 
-    TEST_F(RtcTimeProviderTest, ZeroTtlForcesEveryCallToReReadTheChip)
-    {
+TEST_F(RtcTimeProviderTest, ZeroTtlForcesEveryCallToReReadTheChip)
+{
         RtcFake fake;
         fake.begin(0);
         fake.setEpochMs(1'700'000'000'000LL);
@@ -87,13 +87,13 @@ namespace
         provider.setRefreshIntervalMs(0); // disable cache
 
         for (int i = 0; i < 3; ++i) {
-            (void)provider.nowMs();
+                (void)provider.nowMs();
         }
         EXPECT_GE(fake.readEpochCallCount(), 3U);
-    }
+}
 
-    TEST_F(RtcTimeProviderTest, InvalidateCacheForcesNextReadFromChip)
-    {
+TEST_F(RtcTimeProviderTest, InvalidateCacheForcesNextReadFromChip)
+{
         RtcFake fake;
         fake.begin(0);
         fake.setEpochMs(1'000'000LL);
@@ -115,10 +115,10 @@ namespace
         EXPECT_GE(reported, 2'000'000LL);
         EXPECT_LT(reported, 2'000'000LL + 1000);
         EXPECT_GT(fake.readEpochCallCount(), before);
-    }
+}
 
-    TEST_F(RtcTimeProviderTest, TimeNotValidOnChipMakesProviderInvalid)
-    {
+TEST_F(RtcTimeProviderTest, TimeNotValidOnChipMakesProviderInvalid)
+{
         RtcFake fake;
         fake.begin(0);
         fake.setTimeValid(false); // OSF / CH set
@@ -129,10 +129,10 @@ namespace
         // ITimeProvider contract says now() may return anything when
         // !isValid(); core's ungula::core::time::now() falls back to local
         // millis() in that case. We just verify isValid() is the gate.
-    }
+}
 
-    TEST_F(RtcTimeProviderTest, ReadFailureMakesProviderInvalid)
-    {
+TEST_F(RtcTimeProviderTest, ReadFailureMakesProviderInvalid)
+{
         RtcFake fake;
         fake.begin(0);
         fake.setTimeValid(true);
@@ -140,12 +140,12 @@ namespace
 
         RtcTimeProvider provider(fake);
         EXPECT_FALSE(provider.isValid());
-    }
+}
 
-    // ---- Plug-in into core's setTimeProvider ----
+// ---- Plug-in into core's setTimeProvider ----
 
-    TEST_F(RtcTimeProviderTest, InstallsAsCoreTimeProvider)
-    {
+TEST_F(RtcTimeProviderTest, InstallsAsCoreTimeProvider)
+{
         RtcFake fake;
         fake.begin(0);
         fake.setEpochMs(1'700'000'000'000LL);
@@ -160,10 +160,10 @@ namespace
         const int64_t reported = tc::now();
         EXPECT_GE(reported, 1'700'000'000'000LL);
         EXPECT_LT(reported, 1'700'000'000'000LL + 1000);
-    }
+}
 
-    TEST_F(RtcTimeProviderTest, CoreNowFallsBackToLocalWhenChipInvalid)
-    {
+TEST_F(RtcTimeProviderTest, CoreNowFallsBackToLocalWhenChipInvalid)
+{
         RtcFake fake;
         fake.begin(0);
         fake.setTimeValid(false);
@@ -174,6 +174,6 @@ namespace
         // Provider reports invalid → core falls back to monotonic
         // millis(), which is tiny compared to a 2023 epoch.
         EXPECT_LT(tc::now(), 1'000'000'000LL);
-    }
+}
 
 } // namespace

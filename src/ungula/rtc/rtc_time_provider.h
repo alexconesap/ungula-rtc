@@ -42,7 +42,7 @@
 namespace ungula::rtc
 {
 
-    class RtcTimeProvider final : public ungula::core::time::ITimeProvider {
+class RtcTimeProvider final : public ungula::core::time::ITimeProvider {
     public:
         using duration_ms_t = ungula::core::time::duration_ms_t;
         using tick_ms_t = ungula::core::time::tick_ms_t;
@@ -65,11 +65,11 @@ namespace ungula::rtc
         /// `now()` re-reads the chip).
         void setRefreshIntervalMs(duration_ms_t intervalMs)
         {
-            refreshIntervalMs_ = intervalMs;
+                refreshIntervalMs_ = intervalMs;
         }
         duration_ms_t refreshIntervalMs() const
         {
-            return refreshIntervalMs_;
+                return refreshIntervalMs_;
         }
 
         /// @brief Force the next `now()` to re-read the chip.
@@ -77,7 +77,7 @@ namespace ungula::rtc
         /// stale cached values for up to TTL ms.
         void invalidateCache()
         {
-            cachedValid_ = false;
+                cachedValid_ = false;
         }
 
     private:
@@ -91,6 +91,6 @@ namespace ungula::rtc
         mutable epoch_ms_t cachedEpochMs_ = 0;
         mutable tick_ms_t cachedAnchorTick_ = 0;
         mutable bool cachedValid_ = false;
-    };
+};
 
 } // namespace ungula::rtc

@@ -22,9 +22,10 @@
 namespace ungula::rtc::drivers
 {
 
-    class RtcFake final : public IRtc {
+class RtcFake final : public IRtc {
     public:
-        RtcFake(const char *name = "fake", ungula::hal::multiplexer::IMultiplexer *multiplexer = nullptr)
+        RtcFake(const char *name = "fake",
+                ungula::hal::multiplexer::IMultiplexer *multiplexer = nullptr)
                 : IRtc("FAKE", name, multiplexer)
         {
         }
@@ -33,113 +34,113 @@ namespace ungula::rtc::drivers
 
         bool begin(uint8_t multiplexerChannel = 0) override
         {
-            ++beginCallCount_;
-            multiplexerChannel_ = multiplexerChannel;
-            isInitialized_ = true;
-            if (!beginResult_) {
-                setInitializationStatus(Error::BeginFailed);
-            }
-            return beginResult_;
+                ++beginCallCount_;
+                multiplexerChannel_ = multiplexerChannel;
+                isInitialized_ = true;
+                if (!beginResult_) {
+                        setInitializationStatus(Error::BeginFailed);
+                }
+                return beginResult_;
         }
 
         bool isConnected() override
         {
-            ++isConnectedCallCount_;
-            return isConnectedResult_;
+                ++isConnectedCallCount_;
+                return isConnectedResult_;
         }
 
         bool isTimeValid() override
         {
-            ++isTimeValidCallCount_;
-            if (!selectMultiplexerChannel()) {
-                return false;
-            }
-            return timeValid_;
+                ++isTimeValidCallCount_;
+                if (!selectMultiplexerChannel()) {
+                        return false;
+                }
+                return timeValid_;
         }
 
         bool readEpochMs(epoch_ms_t &out) override
         {
-            ++readEpochCallCount_;
-            if (!selectMultiplexerChannel()) {
-                return false;
-            }
-            if (!readResult_) {
-                last_error_ = Error::I2CReadError;
-                return false;
-            }
-            out = scriptedEpochMs_;
-            clearLastError();
-            return true;
+                ++readEpochCallCount_;
+                if (!selectMultiplexerChannel()) {
+                        return false;
+                }
+                if (!readResult_) {
+                        last_error_ = Error::I2CReadError;
+                        return false;
+                }
+                out = scriptedEpochMs_;
+                clearLastError();
+                return true;
         }
 
         bool writeEpochMs(epoch_ms_t epochMs) override
         {
-            ++writeEpochCallCount_;
-            if (!selectMultiplexerChannel()) {
-                return false;
-            }
-            if (!writeResult_) {
-                last_error_ = Error::I2CWriteError;
-                return false;
-            }
-            scriptedEpochMs_ = epochMs;
-            timeValid_ = true; // a successful write always validates
-            clearLastError();
-            return true;
+                ++writeEpochCallCount_;
+                if (!selectMultiplexerChannel()) {
+                        return false;
+                }
+                if (!writeResult_) {
+                        last_error_ = Error::I2CWriteError;
+                        return false;
+                }
+                scriptedEpochMs_ = epochMs;
+                timeValid_ = true; // a successful write always validates
+                clearLastError();
+                return true;
         }
 
         // ---- Test knobs ----
 
         void setBeginResult(bool ok)
         {
-            beginResult_ = ok;
+                beginResult_ = ok;
         }
         void setIsConnected(bool ok)
         {
-            isConnectedResult_ = ok;
+                isConnectedResult_ = ok;
         }
         void setTimeValid(bool valid)
         {
-            timeValid_ = valid;
+                timeValid_ = valid;
         }
         void setEpochMs(epoch_ms_t v)
         {
-            scriptedEpochMs_ = v;
+                scriptedEpochMs_ = v;
         }
         void setReadResult(bool ok)
         {
-            readResult_ = ok;
+                readResult_ = ok;
         }
         void setWriteResult(bool ok)
         {
-            writeResult_ = ok;
+                writeResult_ = ok;
         }
 
         // ---- Inspectors ----
 
         epoch_ms_t scriptedEpochMs() const
         {
-            return scriptedEpochMs_;
+                return scriptedEpochMs_;
         }
         uint32_t beginCallCount() const
         {
-            return beginCallCount_;
+                return beginCallCount_;
         }
         uint32_t isConnectedCallCount() const
         {
-            return isConnectedCallCount_;
+                return isConnectedCallCount_;
         }
         uint32_t isTimeValidCallCount() const
         {
-            return isTimeValidCallCount_;
+                return isTimeValidCallCount_;
         }
         uint32_t readEpochCallCount() const
         {
-            return readEpochCallCount_;
+                return readEpochCallCount_;
         }
         uint32_t writeEpochCallCount() const
         {
-            return writeEpochCallCount_;
+                return writeEpochCallCount_;
         }
 
     private:
@@ -155,6 +156,6 @@ namespace ungula::rtc::drivers
         uint32_t isTimeValidCallCount_ = 0;
         uint32_t readEpochCallCount_ = 0;
         uint32_t writeEpochCallCount_ = 0;
-    };
+};
 
 } // namespace ungula::rtc::drivers

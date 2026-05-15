@@ -16,17 +16,17 @@
 namespace ungula::rtc::detail
 {
 
-    constexpr uint8_t bcdToBin(uint8_t bcd)
-    {
+constexpr uint8_t bcdToBin(uint8_t bcd)
+{
         return static_cast<uint8_t>(((bcd >> 4) & 0x0FU) * 10U + (bcd & 0x0FU));
-    }
+}
 
-    constexpr uint8_t binToBcd(uint8_t bin)
-    {
+constexpr uint8_t binToBcd(uint8_t bin)
+{
         if (bin > 99U) {
-            return 0U;
+                return 0U;
         }
         return static_cast<uint8_t>(((bin / 10U) << 4) | (bin % 10U));
-    }
+}
 
 } // namespace ungula::rtc::detail
