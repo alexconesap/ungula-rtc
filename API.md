@@ -13,6 +13,31 @@ automatically. The multiplexer is optional — every driver works with
 
 ---
 
+## LLM quick map
+
+- **Primary include**: `#include <ungula/rtc.h>`.
+- **Arduino discovery include**: `#include <ungula_rtc.h>` (forwarder only; host code should keep using the real header).
+- **Namespace root**: `ungula::rtc`.
+- **Language baseline**: C++17 minimum (examples avoid post-C++17 requirements).
+- **Supported architectures**: `esp32,esp32-s3`.
+- **Read order for coding agents**: `Usage` (working patterns) -> `API` (symbols/signatures) -> `Lifecycle`/`Error handling`/`Threading` notes in this file.
+
+### Use-case index
+
+- [Use case: DS3231 plugged into the time API](#use-case-ds3231-plugged-into-the-time-api)
+- [Use case: detect "battery dead, time lost" on boot](#use-case-detect-battery-dead-time-lost-on-boot)
+- [Use case: DS1307 with API-identical code](#use-case-ds1307-with-api-identical-code)
+- [Use case: chip behind a multiplexer](#use-case-chip-behind-a-multiplexer)
+- [Use case: per-instance debugging](#use-case-per-instance-debugging)
+
+### LLM rules
+
+- Use only symbols and include paths documented in this file; do not infer extra public API from implementation files.
+- Prefer the use-case patterns here over ad-hoc rewrites; keep dependency wiring and lifecycle order identical unless the task explicitly changes API design.
+- Treat headers under `detail/`, `platform/`, and `platforms/` as internal unless this document calls them out as public.
+- If required behavior is missing from the documented API, report the gap explicitly instead of inventing new public symbols.
+
+
 ## Usage
 
 ### Use case: DS3231 plugged into the time API

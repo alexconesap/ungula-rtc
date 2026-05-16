@@ -2,24 +2,30 @@
 
 > **Battery-backed real-time clocks for embedded C++** — DS3231 and DS1307 today, more chips on the same `IRtc` interface tomorrow.
 
+> **LLM usage note:** if this library is consumed from a coding AI workflow, explicitly point the agent to `API.md` first. `API.md` is the LLM-facing contract (public API + examples + constraints) and avoids wasting time/tokens scanning source files and this human-oriented README.
+
 The host project sets the time once (from NTP, a setup screen, anything),
 and the RTC keeps wall-clock time across reboots, brown-outs and battery
 swaps. Plug the chip into the rest of the codebase via the existing
 `ungula::core::time::setTimeProvider(...)` hook and `now()` / `nowLocal()` /
 `formatLocal()` start returning real wall-clock time.
 
-## Table of contents
+## Table of Contents
 
 - [Features](#features)
 - [Supported chips](#supported-chips)
 - [Dependencies](#dependencies)
 - [Architecture](#architecture)
-- [Quick start — DS3231 plugged into the time API](#quick-start--ds3231-plugged-into-the-time-api)
+- [Quick start — DS3231 plugged into the time API](#quick-start-ds3231-plugged-into-the-time-api)
 - [Setting the initial time](#setting-the-initial-time)
+  - [From NTP, after WiFi comes up](#from-ntp-after-wifi-comes-up)
+  - [From a setup screen / build-time default](#from-a-setup-screen-build-time-default)
 - [Multiplexer is optional](#multiplexer-is-optional)
 - [Logging](#logging)
 - [Testing](#testing)
+- [Acknowledgements](#acknowledgements)
 - [License](#license)
+- [Arduino CLI symlink note (rarely relevant)](#arduino-cli-symlink-note-rarely-relevant)
 
 ## Features
 
