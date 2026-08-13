@@ -34,11 +34,16 @@ automatically. The multiplexer is optional — every driver works with
 
 ### LLM rules
 
-- Use only symbols and include paths documented in this file; do not infer extra public API from implementation files.
-- Prefer the use-case patterns here over ad-hoc rewrites; keep dependency wiring and lifecycle order identical unless the task explicitly changes API design.
-- Treat headers under `detail/`, `platform/`, and `platforms/` as internal unless this document calls them out as public.
-- If required behavior is missing from the documented API, report the gap explicitly instead of inventing new public symbols.
-
+- Use only the symbols and include paths documented in this file. Do not infer extra public API from the implementation files, and do not invent symbols — if the behavior you need is missing, report the gap.
+- Follow the use-case patterns below; keep dependency wiring and lifecycle order identical unless the task is explicitly about changing the API.
+- Treat headers under `detail/` as internal.
+- Use `IRtc*` in code that consumes RTCs. Do not depend on the concrete driver type.
+- Pass `nullptr` for the multiplexer when the chip is direct-connect. Do not invent a "null multiplexer" wrapper.
+- Always check `chip.isTimeValid()` on boot before trusting the time, and re-write from NTP / user / default when it is false. This is the check that catches a never-set chip — `readEpochMs()` alone reports success with epoch 0.
+- Do not branch on `Error::TimeNotValid`; no driver produces it.
+- Use `ungula::core::time::*` for any pacing — never `delay()` / `delayMicroseconds()`.
+- Do not move time abstractions out of UngulaCore into this library — `ITimeProvider` and `epoch_ms_t` belong to core; this library is one of several sources for it.
+- Logging is per-instance (`chip.enableLogging()`), module tag fixed (`rtc`).
 
 ## Usage
 
@@ -267,13 +272,3 @@ Header-only test fake.
 - `RtcTimeProvider::nowMs()` does at most one chip read per TTL window **while the cache is valid**. An unreachable or unset chip re-reads on every call.
 - The cache is plain mutable member state on the provider instance — no globals, no locks. One provider per chip.
 - `i_rtc.cpp` links against **EmblogX** for the log helpers even when logging is off. It is not listed in `library.properties` `depends=`, so the host project must provide it.
-
-## LLM usage rules
-
-- Use `IRtc*` in code that consumes RTCs. Do not depend on the concrete driver type.
-- Pass `nullptr` for the multiplexer when the chip is direct-connect. Do not invent a "null multiplexer" wrapper.
-- Always check `chip.isTimeValid()` on boot before trusting the time. Re-write from NTP / user / default when false. This is the check that catches a never-set chip — `readEpochMs()` alone will happily report success with epoch 0.
-- Do not branch on `Error::TimeNotValid`; no driver produces it.
-- Use `ungula::core::time::*` for any pacing — never `delay()` / `delayMicroseconds()`.
-- Do not move time abstractions out of UngulaCore into this library — `ITimeProvider` and `epoch_ms_t` belong to core; this library is one of several sources for it.
-- Logging is per-instance (`chip.enableLogging()`), module tag fixed (`rtc`).
