@@ -24,6 +24,7 @@ swaps. Plug the chip into the rest of the codebase via the existing
   - [From NTP, after WiFi comes up](#from-ntp-after-wifi-comes-up)
   - [From a setup screen / build-time default](#from-a-setup-screen-build-time-default)
 - [Multiplexer is optional](#multiplexer-is-optional)
+- [Known limits](#known-limits)
 - [Logging](#logging)
 - [Testing](#testing)
 - [Acknowledgements](#acknowledgements)
@@ -171,6 +172,27 @@ chip.begin();   // multiplexer channel ignored
 
 The driver handles `selectMultiplexerChannel()` internally before every transaction.
 
+## Known limits
+
+Worth knowing before you wire one of these in:
+
+- **Year range 2000..2099.** Both chips store a two-digit year. The
+  DS3231 century bit is ignored on read, and `writeEpochMs()` refuses
+  anything outside the range instead of silently truncating.
+- **24-hour mode is assumed.** The hour register is masked with `0x3F`
+  and the 12/24 bit is not inspected. A chip left in 12-hour mode by
+  other firmware decodes the hour wrong until the first
+  `writeEpochMs()`, which always writes 24-hour mode.
+- **`readEpochMs()` can succeed with epoch 0.** A never-set chip holds
+  zeros, which decode to month 0 / day 0. The codec rejects the date and
+  yields `0`, but the call still returns `true`. `isTimeValid()` is the
+  boot check that catches it — do not skip it.
+- **No timezone or DST handling here.** The chips hold UTC by
+  convention; local time is `ungula::core::time`'s job
+  (`setTimezone()`, `nowLocal()`, `formatLocal()`).
+- **EmblogX is a link-time dependency** of `i_rtc.cpp` even with logging
+  off, and it is not listed in `library.properties` `depends=`.
+
 ## Logging
 
 Off by default. `enableLogging()` routes diagnostics through EmblogX with the module tag `rtc`. Per-instance — debugging one RTC doesn't pollute logs from other devices.
@@ -217,7 +239,7 @@ Thanks to Claude and ChatGPT for helping on generating this documentation.
 
 ## License
 
-MIT License — see [LICENSE](license.txt) file.
+MIT License — see [LICENSE](LICENSE) file.
 
 ---
 
